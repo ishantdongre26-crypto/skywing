@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 require("dotenv").config();
 
 const app = express();
@@ -36,19 +37,7 @@ app.use(express.static("public"));
 // Session configuration
 const isProduction = process.env.NODE_ENV === "production" || process.env.RENDER_EXTERNAL_URL;
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-        secure: isProduction, // true in production (HTTPS)
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: isProduction ? 'none' : 'lax' // 'none' for cross-origin in production
-    }
-}));
-
-// Connect to MongoDB
+// Connect to MongoDB first
 const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URL;
 
 if (!MONGO_URI) {
@@ -59,6 +48,31 @@ if (!MONGO_URI) {
     .then(() => console.log("✅ MongoDB Connected successfully!"))
     .catch(err => console.error("❌ MongoDB Connection Error:", err.message));
 }
+
+// Configure session with MongoStore for production scaling
+const sessionConfig = {
+    secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: isProduction, // true in production (HTTPS)
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: isProduction ? 'none' : 'lax' // 'none' for cross-origin in production
+    }
+};
+
+// Use MongoStore in production for session persistence across multiple instances
+if (isProduction && MONGO_URI) {
+    sessionConfig.store = MongoStore.create({
+        mongoUrl: MONGO_URI,
+        collectionName: 'sessions',
+        ttl: 24 * 60 * 60 // 24 hours
+    });
+    console.log("✅ Using MongoDB for session storage (production mode)");
+}
+
+app.use(session(sessionConfig));
 
 // Routes
 const userRoutes = require("./routes/userRoutes");
