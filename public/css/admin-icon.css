@@ -1,0 +1,21 @@
+/* Admin Dashboard Icon Styles */
+
+.admin-dashboard-link {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #a88420 100%) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    margin-left: 10px;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+}
+
+.admin-dashboard-link:hover {
+    background: linear-gradient(135deg, #a88420 0%, var(--secondary-color) 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.4);
+}
+
+.admin-dashboard-link i {
+    margin-right: 5px;
+}
+

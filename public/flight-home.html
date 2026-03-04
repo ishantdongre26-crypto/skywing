@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyWing - Flight Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/flight.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin-icon.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">
+                <i class="fas fa-plane-departure me-2"></i>
+                SkyWing
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.html">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="flight-home.html">
+                            <i class="fas fa-search me-1"></i> Search Flights
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="my-bookings.html">
+                            <i class="fas fa-ticket-alt me-1"></i> My Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="deals.html">
+                            <i class="fas fa-tags me-1"></i> Deals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="help-support.html">
+                            <i class="fas fa-question-circle me-1"></i> Help & Support
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center" id="userNav">
+                    <span class="user-name me-3" id="userName"></span>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="search-results-section" id="searchResults">
+            <div class="results-header">
+                <h3><i class="fas fa-plane me-2"></i>Available Flights</h3>
+                <span class="results-count" id="resultsCount"></span>
+            </div>
+            <div id="resultsContainer"></div>
+        </section>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p>Searching for the best flights...</p>
+        </div>
+
+        <section class="hero-section">
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h1 class="hero-title">Book Your Dream Flight</h1>
+                    <p class="hero-subtitle">
+                        Discover the best deals on flights worldwide. Your journey starts here with SkyWing - your trusted flight booking partner.
+                    </p>
+                    
+                    <div class="stats-section">
+                        <div class="stat-card">
+                            <div class="stat-icon text-primary">
+                                <i class="fas fa-globe-americas"></i>
+                            </div>
+                            <h3>500+</h3>
+                            <p>Destinations</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon text-success">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <h3>50+</h3>
+                            <p>Airlines</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon text-warning">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>1M+</h3>
+                            <p>Happy Customers</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon text-info">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h3>24/7</h3>
+                            <p>Customer Support</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="flight-search-form">
+                        <h4 class="mb-4 text-center">
+                            <i class="fas fa-search me-2 text-primary"></i>Search Flights
+                        </h4>
+                        
+                        <div class="trip-type">
+                            <label>
+                                <input type="radio" name="tripType" value="roundtrip" checked> Round Trip
+                            </label>
+                            <label>
+                                <input type="radio" name="tripType" value="oneway"> One Way
+                            </label>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">From</label>
+                                <input type="text" class="form-control" id="fromCity" placeholder="City or Airport" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">To</label>
+                                <input type="text" class="form-control" id="toCity" placeholder="City or Airport" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Departure Date</label>
+                                <input type="date" class="form-control" id="departureDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Return Date</label>
+                                <input type="date" class="form-control" id="returnDate">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Adults</label>
+                                <select class="form-select" id="adults">
+                                    <option value="1" selected>1 Adult</option>
+                                    <option value="2">2 Adults</option>
+                                    <option value="3">3 Adults</option>
+                                    <option value="4">4 Adults</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Children</label>
+                                <select class="form-select" id="children">
+                                    <option value="0" selected>0 Children</option>
+                                    <option value="1">1 Child</option>
+                                    <option value="2">2 Children</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Class</label>
+                                <select class="form-select" id="flightClass">
+                                    <option value="economy" selected>Economy</option>
+                                    <option value="business">Business</option>
+                                    <option value="first">First Class</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="search-btn" onclick="searchFlights()">
+                            <i class="fas fa-search me-2"></i>Search Flights
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <h5>Best Price Guarantee</h5>
+                        <p>Find a lower price? We'll match it!</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>Secure Booking</h5>
+                        <p>Your payment info is always safe</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h5>Instant Confirmation</h5>
+                        <p>Get your e-ticket immediately</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-undo"></i>
+                        </div>
+                        <h5>Free Cancellation</h5>
+                        <p>Cancel within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="destinations-section">
+            <h2 class="section-title">Popular Destinations</h2>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="destination-card" onclick="quickSearch('New York', 'Paris')">
+                        <div class="destination-img">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <div class="destination-body">
+                            <h4>Paris, France</h4>
+                            <p>The city of love and lights</p>
+                            <span class="price-tag">From $450</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="destination-card" onclick="quickSearch('Los Angeles', 'Tokyo')">
+                        <div class="destination-img">
+                            <i class="fas fa-torii-gate"></i>
+                        </div>
+                        <div class="destination-body">
+                            <h4>Tokyo, Japan</h4>
+                            <p>Where tradition meets future</p>
+                            <span class="price-tag">From $680</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="destination-card" onclick="quickSearch('Miami', 'New York')">
+                        <div class="destination-img">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="destination-body">
+                            <h4>New York, USA</h4>
+                            <p>The city that never sleeps</p>
+                            <span class="price-tag">From $320</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="destination-card" onclick="quickSearch('Dubai', 'London')">
+                        <div class="destination-img">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="destination-body">
+                            <h4>Dubai, UAE</h4>
+                            <p>Luxury in the desert</p>
+                            <span class="price-tag">From $520</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="airlines-section">
+            <h2 class="section-title">Featured Airlines</h2>
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="airline-card">
+                        <div class="airline-logo">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <h5>Emirates</h5>
+                        <p>Flying to 150+ destinations</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="airline-card">
+                        <div class="airline-logo">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <h5>Qatar Airways</h5>
+                        <p>World's best airline 2024</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="airline-card">
+                        <div class="airline-logo">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <h5>Singapore Airlines</h5>
+                        <p>Exceptional service</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="airline-card">
+                        <div class="airline-logo">
+                            <i class="fas fa-plane"></i>
+                        </div>
+                        <h5>Delta Air Lines</h5>
+                        <p>Premium travel experience</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5>
+                    <i class="fas fa-plane-departure me-2 text-primary"></i>
+                    SkyWing
+                </h5>
+                <p class="text-muted mb-3">
+                    Your trusted partner for flight bookings. We make travel easy, affordable, and accessible for everyone.
+                </p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <h5>Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <ul class="footer-links">
+                    <li>
+                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                        123 Aviation Way, New York, USA
+                    </li>
+                    <li>
+                        <i class="fas fa-phone me-2 text-muted"></i>
+                        +1 (555) 123-4567
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope me-2 text-muted"></i>
+                        support@skywing.com
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 SkyWing. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="js/flight.js"></script>
+    <script src="js/admin-icon.js"></script>
+</body>
+</html>

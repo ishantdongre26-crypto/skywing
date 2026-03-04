@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin Registration - SkyWing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        :root {
+            --primary-color: #1e3a5f;
+            --secondary-color: #c9a227;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --text-dark: #1a1a2e;
+            --text-muted: #4a5568;
+            --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, rgba(10, 22, 40, 0.92) 0%, rgba(30, 58, 95, 0.88) 100%),
+                        url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(201, 162, 39, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(30, 58, 95, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-container {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f4f8 100%);
+            border-radius: 25px;
+            padding: 50px 45px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--secondary-color);
+            animation: slideIn 0.6s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .description {
+            color: var(--text-muted);
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+            color: var(--text-dark);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        input:focus {
+            background: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2d4a6f 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2d4a6f 0%, var(--primary-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(30, 58, 95, 0.3);
+        }
+
+        p {
+            text-align: center;
+            margin-top: 28px;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 28px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            padding: 0 18px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            h2 {
+                font-size: 22px;
+            }
+            
+            .description {
+                font-size: 14px;
+            }
+            
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            input {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+            
+            button {
+                padding: 14px;
+                font-size: 16px;
+            }
+            
+            p {
+                font-size: 14px;
+                margin-top: 20px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .login-container {
+                padding: 25px 15px;
+            }
+            
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Admin Registration</h2>
+    <p class="description">Create an admin account to manage the SkyWing platform</p>
+
+    <form id="adminForm">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" placeholder="Enter your name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+
+        <div class="form-group">
+            <label for="secretCode">Secret Code</label>
+            <input type="password" id="secretCode" placeholder="Enter secret code" required>
+        </div>
+
+        <button type="submit">Register as Admin</button>
+    </form>
+
+    <div class="divider"><span>OR</span></div>
+
+    <p>Regular user? <a href="index.html">Register here</a></p>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+</div>
+
+<script>
+document.getElementById("adminForm")?.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const user = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        secretCode: document.getElementById("secretCode").value
+    };
+
+    try {
+        const response = await fetch("/api/users/admin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify(user)
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert("Admin Registration Successful! Please login with your credentials.");
+            window.location.href = "login.html";
+        } else {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+});
+</script>
+
+</body>
+</html>
