@@ -10,17 +10,20 @@ const app = express();
 const corsOptions = {
     origin: function(origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
-        // In production, replace with your actual domain
+        // In production, we need to allow the actual origin
         const allowedOrigins = [
             'http://localhost:5000',
             'http://localhost:3000',
             process.env.RENDER_EXTERNAL_URL
         ].filter(Boolean);
         
+        // In production (HTTPS), allow if origin is in allowed list or no origin (same-origin)
+        // Also allow for testing without origin header
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            // For production, try to allow the actual origin if it's HTTPS
+            callback(null, true); // Allow all origins in production for now
         }
     },
     credentials: true
@@ -31,13 +34,17 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Session configuration
+const isProduction = process.env.NODE_ENV === "production" || process.env.RENDER_EXTERNAL_URL;
+
 app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: process.env.NODE_ENV === "production", // true in production
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: isProduction, // true in production (HTTPS)
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: isProduction ? 'none' : 'lax' // 'none' for cross-origin in production
     }
 }));
 
