@@ -8,23 +8,28 @@ require("dotenv").config();
 const app = express();
 
 // CORS configuration - allows both local and production
+const isProduction = process.env.NODE_ENV === "production" || process.env.RENDER_EXTERNAL_URL;
+
 const corsOptions = {
     origin: function(origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        // In production, we need to allow the actual origin
+        // In production, allow any origin (for cross-origin cookies)
+        if (isProduction) {
+            callback(null, true);
+            return;
+        }
+        
+        // For development, use the allowed list
         const allowedOrigins = [
             'http://localhost:5000',
             'http://localhost:3000',
             process.env.RENDER_EXTERNAL_URL
         ].filter(Boolean);
         
-        // In production (HTTPS), allow if origin is in allowed list or no origin (same-origin)
-        // Also allow for testing without origin header
+        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            // For production, try to allow the actual origin if it's HTTPS
-            callback(null, true); // Allow all origins in production for now
+            callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true
@@ -35,8 +40,6 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Session configuration
-const isProduction = process.env.NODE_ENV === "production" || process.env.RENDER_EXTERNAL_URL;
-
 // Connect to MongoDB first
 const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URL;
 
