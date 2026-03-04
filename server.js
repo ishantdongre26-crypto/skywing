@@ -61,7 +61,7 @@ const sessionConfig = {
         secure: isProduction, // true in production (HTTPS)
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: isProduction ? 'none' : 'lax' // 'none' for cross-origin in production
+        sameSite: 'lax' // Works well for same-domain apps
     }
 };
 
