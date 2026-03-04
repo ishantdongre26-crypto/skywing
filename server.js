@@ -52,28 +52,18 @@ if (!MONGO_URI) {
     .catch(err => console.error("❌ MongoDB Connection Error:", err.message));
 }
 
-// Configure session with MongoStore for production scaling
+// Configure session - simplified for now
 const sessionConfig = {
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: isProduction, // true in production (HTTPS)
+        secure: false, // Set to false for initial testing
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
-        sameSite: 'lax' // Works well for same-domain apps
+        sameSite: 'lax'
     }
 };
-
-// Use MongoStore in production for session persistence across multiple instances
-if (isProduction && MONGO_URI) {
-    sessionConfig.store = MongoStore.create({
-        mongoUrl: MONGO_URI,
-        collectionName: 'sessions',
-        ttl: 24 * 60 * 60 // 24 hours
-    });
-    console.log("✅ Using MongoDB for session storage (production mode)");
-}
 
 app.use(session(sessionConfig));
 
