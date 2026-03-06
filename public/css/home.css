@@ -4,7 +4,7 @@
     --primary-color: #1e3a5f;        /* Deep Navy Blue */
     --secondary-color: #c9a227;      /* Gold Accent */
     --accent-color: #0d6efd;         /* Bright Blue */
-    --success-color: #198754;        /* Emerald Green */
+    --success-color: #198754;         /* Emerald Green */
     --danger-color: #dc3545;         /* Deep Red */
     --dark-color: #0a1628;           /* Very Dark Navy */
     --light-bg: #f8f9fa;
@@ -34,7 +34,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Decorative overlay pattern */
+/* Animated Background */
 body::before {
     content: '';
     position: fixed;
@@ -43,10 +43,17 @@ body::before {
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(circle at 10% 20%, rgba(201, 162, 39, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 90% 80%, rgba(30, 58, 95, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 10% 20%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(30, 58, 95, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.05) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
+    animation: backgroundPulse 8s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 /* Navbar - Professional Dark Theme */
@@ -55,6 +62,18 @@ body::before {
     border-bottom: 2px solid var(--secondary-color);
     padding: 8px 0 !important;
     backdrop-filter: none;
+    animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .navbar-brand {
@@ -62,10 +81,22 @@ body::before {
     font-size: 22px !important;
     color: white !important;
     letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+    text-shadow: 0 0 20px rgba(201, 162, 39, 0.5);
 }
 
 .navbar-brand i {
     color: var(--secondary-color);
+    animation: planeFly 2s ease-in-out infinite;
+}
+
+@keyframes planeFly {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
 }
 
 .nav-link {
@@ -75,11 +106,30 @@ body::before {
     transition: all 0.3s ease;
     border-radius: 6px;
     font-size: 14px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--secondary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::before {
+    width: 80%;
 }
 
 .nav-link:hover {
     color: var(--secondary-color) !important;
     background: rgba(201, 162, 39, 0.1);
+    transform: translateY(-2px);
 }
 
 .nav-link.active {
@@ -104,6 +154,36 @@ body::before {
     background: linear-gradient(135deg, rgba(30, 58, 95, 0.6) 0%, rgba(10, 22, 40, 0.4) 100%);
     border-radius: 20px;
     border: 1px solid rgba(201, 162, 39, 0.3);
+    animation: fadeInUp 0.8s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.1) 0%, transparent 50%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .welcome-title {
@@ -112,10 +192,34 @@ body::before {
     color: white;
     margin-bottom: 15px;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: titleGlow 3s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+    0%, 100% { text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3); }
+    50% { text-shadow: 0 2px 30px rgba(201, 162, 39, 0.5), 0 2px 20px rgba(0, 0, 0, 0.3); }
 }
 
 .welcome-title span {
     color: var(--secondary-color);
+    position: relative;
+}
+
+.welcome-title span::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+    animation: line Shine 2s ease-in-out infinite;
+}
+
+@keyframes Shine {
+    0%, 100% { transform: scaleX(0); opacity: 0; }
+    50% { transform: scaleX(1); opacity: 1; }
 }
 
 .welcome-subtitle {
@@ -125,6 +229,7 @@ body::before {
     max-width: 700px;
     margin-left: auto;
     margin-right: auto;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
 }
 
     /* Search Card - Enhanced for Mobile */
@@ -308,12 +413,26 @@ body::before {
     display: block;
     box-shadow: var(--card-shadow);
     border: 2px solid transparent;
+    animation: cardFloat 3s ease-in-out infinite;
+    animation-delay: calc(var(--card-index, 0) * 0.15s);
 }
+
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.action-card:nth-child(1) { --card-index: 1; animation-delay: 0.1s; }
+.action-card:nth-child(2) { --card-index: 2; animation-delay: 0.2s; }
+.action-card:nth-child(3) { --card-index: 3; animation-delay: 0.3s; }
+.action-card:nth-child(4) { --card-index: 4; animation-delay: 0.4s; }
+.action-card:nth-child(5) { --card-index: 5; animation-delay: 0.5s; }
 
 .action-card:hover {
     background: white;
     transform: translateY(-8px);
     border-color: var(--secondary-color);
+    animation: none;
 }
 
 .action-icon {
@@ -326,6 +445,18 @@ body::before {
     margin: 0 auto 25px;
     font-size: 36px;
     transition: all 0.3s ease;
+    animation: iconBounce 2s ease-in-out infinite;
+    animation-delay: calc(var(--card-index, 0) * 0.2s);
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.action-card:hover .action-icon {
+    animation: none;
+    transform: scale(1.1);
 }
 
 .action-card.primary .action-icon {
