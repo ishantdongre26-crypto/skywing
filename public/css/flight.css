@@ -36,12 +36,12 @@ body {
 .navbar {
     background: rgba(10, 22, 40, 0.98) !important;
     border-bottom: 2px solid var(--secondary-color);
-    padding: 8px 0 !important;
+    padding: 10px 0 !important;
 }
 
 .navbar-brand {
     font-weight: 700;
-    font-size: 22px !important;
+    font-size: 24px !important;
     color: white !important;
     letter-spacing: 1px;
 }
@@ -53,9 +53,9 @@ body {
 .nav-link {
     color: rgba(255, 255, 255, 0.85) !important;
     font-weight: 500;
-    padding: 8px 16px !important;
+    padding: 10px 18px !important;
     transition: all 0.3s ease;
-    border-radius: 6px;
+    border-radius: 7px;
     font-size: 14px;
 }
 

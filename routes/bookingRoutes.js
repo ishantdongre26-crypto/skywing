@@ -137,4 +137,37 @@ router.get("/:bookingRef", authMiddleware, async (req, res) => {
     }
 });
 
+// Cancel a booking (Admin can cancel any user's booking)
+router.put("/cancel/:bookingId", adminAuth, async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        
+        // Find user who has this booking
+        const user = await User.findOne({ "bookings._id": bookingId });
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
+
+        // Find and update the booking status
+        const booking = user.bookings.id(bookingId);
+        if (!booking) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
+
+        // Update status to Cancelled
+        booking.status = "Cancelled";
+        await user.save();
+
+        res.json({ 
+            success: true, 
+            message: `Booking ${booking.bookingRef} has been cancelled successfully`,
+            bookingRef: booking.bookingRef
+        });
+    } catch (err) {
+        console.error("Cancel booking error:", err);
+        res.status(500).json({ success: false, message: "Error cancelling booking" });
+    }
+});
+
 module.exports = router;

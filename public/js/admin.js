@@ -269,6 +269,7 @@ function renderBookingsTable(bookings) {
                     <th>Date</th>
                     <th>Amount</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -277,6 +278,7 @@ function renderBookingsTable(bookings) {
     bookings.forEach(booking => {
         const flight = booking.flight || {};
         const route = flight.from && flight.to ? `${flight.from} → ${flight.to}` : 'N/A';
+        const isCancelled = booking.status === 'Cancelled';
         
         html += `
             <tr>
@@ -286,7 +288,14 @@ function renderBookingsTable(bookings) {
                 <td>${route}</td>
                 <td>${flight.date || 'N/A'}</td>
                 <td>₹${(booking.totalAmount || 0).toLocaleString('en-IN')}</td>
-                <td><span class="status-badge status-confirmed">${booking.status || 'Confirmed'}</span></td>
+                <td><span class="status-badge ${isCancelled ? 'status-cancelled' : 'status-confirmed'}">${booking.status || 'Confirmed'}</span></td>
+                <td>
+                    ${!isCancelled ? `
+                    <button class="action-btn cancel" onclick="cancelBooking('${booking._id}', '${booking.bookingRef}')">
+                        <i class="fas fa-times-circle"></i> Cancel
+                    </button>
+                    ` : '<span style="color: #6c757d;">-</span>'}
+                </td>
             </tr>
         `;
     });
@@ -297,6 +306,32 @@ function renderBookingsTable(bookings) {
     `;
     
     document.getElementById('bookingsTable').innerHTML = html;
+}
+
+// Cancel a user's booking (Admin only)
+async function cancelBooking(bookingId, bookingRef) {
+    if (!confirm(`Are you sure you want to cancel booking ${bookingRef}? This action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/bookings/cancel/${bookingId}`, {
+            method: "PUT",
+            credentials: "include"
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`Booking ${bookingRef} has been cancelled successfully!`);
+            loadAllBookings(); // Reload bookings
+        } else {
+            alert("Error: " + data.message);
+        }
+    } catch (err) {
+        console.error("Error cancelling booking:", err);
+        alert("Error cancelling booking. Please try again.");
+    }
 }
 
 // Logout function
@@ -371,6 +406,9 @@ function renderFeedbackTable(feedbackList) {
         const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
         const date = new Date(feedback.createdAt).toLocaleDateString('en-IN');
         
+        // Encode feedback object as JSON for passing to viewMessage
+        const feedbackJson = encodeURIComponent(JSON.stringify(feedback));
+        
         html += `
             <tr>
                 <td>${feedback.userName}</td>
@@ -378,7 +416,7 @@ function renderFeedbackTable(feedbackList) {
                 <td><span style="color: #c9a227;">${stars}</span></td>
                 <td><span class="status-badge status-pending">${feedback.category}</span></td>
                 <td>${feedback.subject}</td>
-                <td><button class="action-btn view" onclick="viewMessage('${feedback.message.replace(/'/g, "\\'")}')">View</button></td>
+                <td><button class="action-btn view" onclick="viewFeedback('${feedbackJson}')">View</button></td>
                 <td>${date}</td>
                 <td>
                     <button class="action-btn delete" onclick="deleteFeedback('${feedback._id}')">
@@ -397,9 +435,68 @@ function renderFeedbackTable(feedbackList) {
     document.getElementById('feedbackTable').innerHTML = html;
 }
 
-// View full message
+// View full message in modal
+let currentFeedbackId = null;
+
+function viewFeedback(feedbackJson) {
+    const feedback = JSON.parse(decodeURIComponent(feedbackJson));
+    currentFeedbackId = feedback._id;
+    const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+    const date = new Date(feedback.createdAt).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    const modalBody = document.getElementById('feedbackModalBody');
+    modalBody.innerHTML = `
+        <div class="feedback-detail-card" style="background: #f8fafc; border-radius: 15px; padding: 25px;">
+            <div class="feedback-detail-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0;">
+                <div class="feedback-user-info" style="display: flex; gap: 15px;">
+                    <div class="feedback-avatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #1e3a5f, #2d4a6f); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="feedback-user-details">
+                        <h4 style="color: #1e3a5f; margin: 0 0 5px 0; font-size: 18px; font-weight: 700;">${feedback.userName}</h4>
+                        <p style="color: #6c757d; margin: 0 0 5px 0; font-size: 14px;">${feedback.userEmail}</p>
+                        <span class="feedback-date" style="color: #6c757d; font-size: 12px;">${date}</span>
+                    </div>
+                </div>
+                <div class="feedback-rating" style="text-align: right;">
+                    <span class="stars" style="color: #c9a227; font-size: 20px;">${stars}</span>
+                    <span class="rating-text" style="display: block; color: #1e3a5f; font-weight: 600; margin-top: 5px;">${feedback.rating}/5</span>
+                </div>
+            </div>
+            <div class="feedback-detail-body">
+                <div class="feedback-category" style="margin-bottom: 15px;">
+                    <span class="category-label" style="color: #6c757d; font-weight: 600; margin-right: 10px;">Category:</span>
+                    <span class="category-badge" style="background: linear-gradient(135deg, #1e3a5f, #2d4a6f); color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase;">${feedback.category}</span>
+                </div>
+                <div class="feedback-subject" style="margin-bottom: 15px;">
+                    <h5 style="color: #1e3a5f; font-size: 20px; font-weight: 700; margin: 0;">${feedback.subject}</h5>
+                </div>
+                <div class="feedback-message" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <p style="color: #1a1a2e; margin: 0; line-height: 1.7;">${feedback.message}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Setup delete button
+    const deleteBtn = document.getElementById('deleteFeedbackBtn');
+    deleteBtn.onclick = function() {
+        deleteFeedback(feedback._id);
+    };
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+    modal.show();
+}
+
+// Legacy function for backward compatibility
 function viewMessage(message) {
-    alert(message);
+    const feedback = { _id: '', message: message, userName: 'User', userEmail: 'email@example.com', rating: 5, category: 'general', subject: 'Message', createdAt: new Date() };
+    viewFeedback(encodeURIComponent(JSON.stringify(feedback)));
 }
 
 // Delete feedback
@@ -417,6 +514,13 @@ async function deleteFeedback(feedbackId) {
         const data = await response.json();
         
         if (data.success) {
+            // Close the modal first
+            const modalEl = document.getElementById('feedbackModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+            }
+            
             alert("Feedback deleted successfully!");
             loadAllFeedback(); // Reload feedback
         } else {
