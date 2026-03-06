@@ -117,5 +117,20 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+// Get public feedback (for forum view - without private info)
+router.get("/public/all", async (req, res) => {
+    try {
+        // Return feedback without user email and ID - just for public display
+        const feedback = await Feedback.find()
+            .select('userName rating category subject message createdAt adminResponse')
+            .sort({ createdAt: -1 });
+        
+        res.json({ success: true, feedback });
+    } catch (error) {
+        console.error("Get public feedback error:", error);
+        res.status(500).json({ success: false, message: "Error fetching feedback" });
+    }
+});
+
 module.exports = router;
 
