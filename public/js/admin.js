@@ -41,7 +41,8 @@ async function loadDashboardData() {
     await Promise.all([
         loadUsers(),
         loadAllFlights(),
-        loadAllBookings()
+        loadAllBookings(),
+        loadAllFeedback()
     ]);
 }
 
@@ -311,5 +312,118 @@ async function logout() {
     } catch (err) {
         console.error("Logout error:", err);
         window.location.href = "login.html";
+    }
+}
+
+// Load all feedback (admin endpoint)
+async function loadAllFeedback() {
+    try {
+        const response = await fetch("/api/feedback/all", {
+            credentials: "include"
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Update total feedback count
+            document.getElementById('totalFeedback').textContent = data.feedback.length;
+            
+            // Render feedback table
+            renderFeedbackTable(data.feedback);
+        } else {
+            document.getElementById('feedbackTable').innerHTML = `
+                <div class="error-message">Error loading feedback: ${data.message}</div>
+            `;
+        }
+    } catch (err) {
+        console.error("Error loading feedback:", err);
+        document.getElementById('feedbackTable').innerHTML = `
+            <div class="error-message">Error loading feedback. Please try again.</div>
+        `;
+    }
+}
+
+// Render feedback table
+function renderFeedbackTable(feedbackList) {
+    if (!feedbackList || feedbackList.length === 0) {
+        document.getElementById('feedbackTable').innerHTML = '<p>No feedback submitted yet.</p>';
+        return;
+    }
+    
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Rating</th>
+                    <th>Category</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    feedbackList.forEach(feedback => {
+        const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+        const date = new Date(feedback.createdAt).toLocaleDateString('en-IN');
+        
+        html += `
+            <tr>
+                <td>${feedback.userName}</td>
+                <td>${feedback.userEmail}</td>
+                <td><span style="color: #c9a227;">${stars}</span></td>
+                <td><span class="status-badge status-pending">${feedback.category}</span></td>
+                <td>${feedback.subject}</td>
+                <td><button class="action-btn view" onclick="viewMessage('${feedback.message.replace(/'/g, "\\'")}')">View</button></td>
+                <td>${date}</td>
+                <td>
+                    <button class="action-btn delete" onclick="deleteFeedback('${feedback._id}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    document.getElementById('feedbackTable').innerHTML = html;
+}
+
+// View full message
+function viewMessage(message) {
+    alert(message);
+}
+
+// Delete feedback
+async function deleteFeedback(feedbackId) {
+    if (!confirm("Are you sure you want to delete this feedback?")) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/feedback/delete/${feedbackId}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert("Feedback deleted successfully!");
+            loadAllFeedback(); // Reload feedback
+        } else {
+            alert("Error: " + data.message);
+        }
+    } catch (err) {
+        console.error("Error deleting feedback:", err);
+        alert("Error deleting feedback. Please try again.");
     }
 }

@@ -71,9 +71,11 @@ app.use(session(sessionConfig));
 const userRoutes = require("./routes/userRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const flightRoutes = require("./routes/flightRoutes");
+const feedbackRoutes = require("./routes/feedbackRoutes");
 app.use("/api/users", userRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/flights", flightRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 // Health check endpoint for Render
 app.get("/health", (req, res) => {
